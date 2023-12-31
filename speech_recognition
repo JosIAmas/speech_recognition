@@ -1,0 +1,37 @@
+import speech_recognition as sr
+from gtts import gTTS
+import os
+
+# Функция для перевода и воспроизведения аудио
+def translate_audio(input_lang='en', output_lang='es'):
+    # Создаем объект распознавания речи
+    recognizer = sr.Recognizer()
+
+    # Запускаем запись аудио с микрофона
+    with sr.Microphone() as source:
+        print("Скажите что-то...")
+
+        # Слушаем аудио и записываем речь в переменную audio_data
+        audio_data = recognizer.listen(source)
+
+        # Пытаемся распознать речь с помощью облачного сервиса распознавания (Google Speech Recognition)
+        try:
+            text = recognizer.recognize_google(audio_data, language=input_lang)
+            print(f"Вы сказали: {text}")
+
+            # Используем gTTS для синтеза речи на другом языке
+            translated_audio = gTTS(text, lang=output_lang)
+
+            # Сохраняем синтезированную речь в файл audio.mp3
+            translated_audio.save("translated_audio.mp3")
+
+            # Воспроизводим аудиофайл с переведенной речью
+            os.system("start translated_audio.mp3")
+
+        except sr.UnknownValueError:
+            print("Не удалось распознать речь")
+        except sr.RequestError as e:
+            print(f"Ошибка при запросе к сервису распознавания речи: {e}")
+
+# Запускаем функцию для перевода и воспроизведения аудио
+translate_audio()
